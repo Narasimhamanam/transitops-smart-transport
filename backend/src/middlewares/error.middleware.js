@@ -36,14 +36,19 @@ const errorHandler = (err, req, res, next) => {
     return errorResponse(res, 'Validation failed.', err.errors, 422);
   }
 
-  // Default internal server error
+  // Default error handling
   const statusCode = err.statusCode || err.status || 500;
   const message = err.message || 'Internal server error';
 
+  // In production, only hide the message for actual server errors (5xx).
+  // Client errors (4xx) should always show their real message.
+  const isServerError = statusCode >= 500;
+  const safeMessage = (process.env.NODE_ENV === 'production' && isServerError) ? 'Internal server error' : message;
+
   return errorResponse(
     res,
-    process.env.NODE_ENV === 'production' ? 'Internal server error' : message,
-    process.env.NODE_ENV === 'production' ? null : err,
+    safeMessage,
+    (process.env.NODE_ENV === 'production' && isServerError) ? null : err,
     statusCode
   );
 };

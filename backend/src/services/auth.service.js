@@ -4,10 +4,13 @@ const userRepository = require('../repositories/user.repository');
 const { signToken } = require('../config/jwt');
 
 const SALT_ROUNDS = 12;
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 /**
  * Authenticates a user with email and password.
  * Returns a JWT token and user profile on success.
+ * Locks account after 5 consecutive failed password attempts.
  * @param {{ email: string, password: string }} credentials
  */
 const login = async ({ email, password }) => {
@@ -15,8 +18,7 @@ const login = async ({ email, password }) => {
   const user = await userRepository.findByEmail(email);
 
   if (!user) {
-    // Use a generic message to prevent email enumeration
-    throw Object.assign(new Error('Invalid email or password.'), { statusCode: 401 });
+    throw Object.assign(new Error('No account found with this email address.'), { statusCode: 401 });
   }
 
   if (!user.isActive) {
@@ -26,18 +28,48 @@ const login = async ({ email, password }) => {
     );
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw Object.assign(new Error('Invalid email or password.'), { statusCode: 401 });
+  // Check if account is currently locked
+  if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+    const minutesLeft = Math.ceil((new Date(user.lockedUntil) - new Date()) / 60000);
+    throw Object.assign(
+      new Error(`Account is locked due to too many failed login attempts. Try again in ${minutesLeft} minute(s).`),
+      { statusCode: 423 }
+    );
   }
 
-  // Update last login timestamp
-  await userRepository.update(user.id, { lastLogin: new Date() });
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    const newFailedAttempts = (user.failedLoginAttempts || 0) + 1;
+    const updateData = { failedLoginAttempts: newFailedAttempts };
+
+    if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+      updateData.lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
+      await userRepository.update(user.id, updateData);
+      throw Object.assign(
+        new Error('Account locked. Too many failed login attempts. Please try again after 15 minutes.'),
+        { statusCode: 423 }
+      );
+    }
+
+    await userRepository.update(user.id, updateData);
+    const remaining = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+    throw Object.assign(
+      new Error(`Incorrect password. You have ${remaining} attempt(s) remaining before your account is locked.`),
+      { statusCode: 401 }
+    );
+  }
+
+  // Successful login: reset failed attempts and lockout
+  await userRepository.update(user.id, {
+    lastLogin: new Date(),
+    failedLoginAttempts: 0,
+    lockedUntil: null,
+  });
 
   const token = signToken({ id: user.id, role: user.role });
 
   // Return safe user (no password)
-  const { password: _, resetToken: __, resetTokenExpiry: ___, ...safeUser } = user;
+  const { password: _, resetToken: __, resetTokenExpiry: ___, failedLoginAttempts: ____, lockedUntil: _____, ...safeUser } = user;
   safeUser.lastLogin = new Date(); // Return current last login time in response
 
   return { token, user: safeUser };
@@ -107,8 +139,7 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 const forgotPassword = async (email) => {
   const user = await userRepository.findByEmail(email);
   if (!user) {
-    // Return true even if user doesn't exist to prevent email enumeration
-    return true;
+    throw Object.assign(new Error('No account found with this email address.'), { statusCode: 404 });
   }
 
   const rawToken = crypto.randomBytes(32).toString('hex');

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, Eye, Wrench, Check, Ban, AlertTriangle } from 'lucide-react';
 import { usePermission } from '../hooks/usePermission';
+import { cn } from '../utils/cn';
 
 import PageHeader     from '../components/ui/PageHeader';
 import SearchBar      from '../components/ui/SearchBar';

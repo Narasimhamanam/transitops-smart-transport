@@ -14,7 +14,7 @@ export const ROLE_MODULES = {
   FLEET_MANAGER: ['dashboard', 'vehicles', 'maintenance', 'drivers'],
   DISPATCHER:    ['dashboard', 'trips'],
   SAFETY_OFFICER:['dashboard', 'drivers'],
-  FINANCIAL_ANALYST: ['dashboard', 'fuel-logs', 'expenses', 'maintenance', 'analytics'],
+  FINANCIAL_ANALYST: ['dashboard', 'fuel-logs', 'expenses', 'analytics'],
 };
 
 export const MODULE_PERMISSIONS = {
@@ -32,7 +32,6 @@ export const MODULE_PERMISSIONS = {
   },
   maintenance: {
     FLEET_MANAGER:    { canRead: true, canCreate: true, canEdit: true, canDelete: true },
-    FINANCIAL_ANALYST:{ canRead: true, canCreate: false, canEdit: false, canDelete: false },
   },
   'fuel-logs': {
     FINANCIAL_ANALYST:{ canRead: true, canCreate: true, canEdit: true, canDelete: true },

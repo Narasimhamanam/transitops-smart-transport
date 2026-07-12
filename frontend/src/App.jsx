@@ -54,8 +54,8 @@ export default function App() {
             <Route path="/drivers/:id"      element={<DriverDetail />} />
           </Route>
 
-          {/* Fleet Manager + Financial Analyst: Maintenance */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']} />}>
+          {/* Fleet Manager: Maintenance */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
             <Route path="/maintenance"      element={<Maintenance />} />
             <Route path="/maintenance/:id"  element={<MaintenanceDetail />} />
           </Route>

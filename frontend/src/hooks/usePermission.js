@@ -14,6 +14,7 @@ export function usePermission() {
     canEditModule:   (module) => canEdit(role, module),
     canDeleteModule: (module) => canDelete(role, module),
     canReadModule:   (module) => canRead(role, module),
+    canWriteModule:  (module) => canCreate(role, module), // alias used by some pages
     hasRoute:        (path) => canAccessRoute(role, path),
     allowedModules:  ROLE_MODULES[role] ?? [],
   };
