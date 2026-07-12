@@ -8,8 +8,8 @@ const router = Router();
 
 router.use(authenticate);
 
-// Only Fleet Manager and Driver (DISPATCHER) can write trip data
-const WRITE_ROLES = ['FLEET_MANAGER', 'DISPATCHER'];
+// Only Driver (DISPATCHER) can write trip data
+const WRITE_ROLES = ['DISPATCHER'];
 router.post(  '/',          authorize(...WRITE_ROLES), validate(createTripSchema), tripController.create);
 router.put(   '/:id',       authorize(...WRITE_ROLES), validate(updateTripSchema), tripController.update);
 router.delete('/:id',       authorize(...WRITE_ROLES),                             tripController.remove);
@@ -18,8 +18,8 @@ router.post(  '/:id/dispatch', authorize(...WRITE_ROLES), tripController.dispatc
 router.post(  '/:id/complete', authorize(...WRITE_ROLES), tripController.completeTrip);
 router.post(  '/:id/cancel',   authorize(...WRITE_ROLES), tripController.cancelTrip);
 
-// Fleet Manager, Driver (DISPATCHER), and Financial Analyst can read trip data
-router.get(   '/',                                    authorize('FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'), tripController.findAll);
-router.get(   '/:id',                                 authorize('FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'), tripController.findById);
+// Only Driver (DISPATCHER) can read trip data
+router.get(   '/',                                    authorize('DISPATCHER'), tripController.findAll);
+router.get(   '/:id',                                 authorize('DISPATCHER'), tripController.findById);
 
 module.exports = router;

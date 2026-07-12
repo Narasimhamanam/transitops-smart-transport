@@ -42,38 +42,33 @@ export default function App() {
             <Route path="/vehicles/:id"     element={<VehicleDetail />} />
           </Route>
 
-          {/* Fleet Manager + Driver (DISPATCHER): Trips */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'DISPATCHER']} />}>
+          {/* Driver (DISPATCHER): Trips */}
+          <Route element={<RoleGuard allowedRoles={['DISPATCHER']} />}>
             <Route path="/trips"            element={<Trips />} />
             <Route path="/trips/:id"        element={<TripDetail />} />
           </Route>
 
-          {/* Safety Officer: Drivers (read + safety update only) */}
-          <Route element={<RoleGuard allowedRoles={['SAFETY_OFFICER']} />}>
+          {/* Fleet Manager + Safety Officer: Drivers */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'SAFETY_OFFICER']} />}>
             <Route path="/drivers"          element={<Drivers />} />
             <Route path="/drivers/:id"      element={<DriverDetail />} />
           </Route>
 
-          {/* Fleet Manager: Maintenance */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
+          {/* Fleet Manager + Financial Analyst: Maintenance */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']} />}>
             <Route path="/maintenance"      element={<Maintenance />} />
             <Route path="/maintenance/:id"  element={<MaintenanceDetail />} />
           </Route>
 
-          {/* Financial Analyst + Fleet Manager: Fuel & Expenses */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']} />}>
+          {/* Financial Analyst: Fuel & Expenses */}
+          <Route element={<RoleGuard allowedRoles={['FINANCIAL_ANALYST']} />}>
             <Route path="/fuel-logs"        element={<FuelLogs />} />
             <Route path="/expenses"         element={<Expenses />} />
           </Route>
 
-          {/* Analytics: Fleet Manager, Safety Officer, Financial Analyst */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST']} />}>
+          {/* Analytics: Financial Analyst */}
+          <Route element={<RoleGuard allowedRoles={['FINANCIAL_ANALYST']} />}>
             <Route path="/analytics"        element={<Analytics />} />
-          </Route>
-
-          {/* AI Insights: Fleet Manager only */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
-            <Route path="/ai-insights"      element={<AIInsights />} />
           </Route>
 
           {/* Settings: Fleet Manager only */}
