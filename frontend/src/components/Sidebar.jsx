@@ -4,11 +4,13 @@ import {
   Truck,
   Route,
   Users,
-  ShieldCheck,
   BarChart3,
   Settings,
   ChevronLeft,
   Zap,
+  Wrench,
+  Fuel,
+  DollarSign
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
@@ -23,27 +25,30 @@ const ALL_NAV_ITEMS = [
   {
     section: 'Operations',
     items: [
-      { label: 'Fleet',      icon: Truck,       href: '/fleet',      roles: ['FLEET_MANAGER'] },
-      { label: 'Trips',      icon: Route,       href: '/trips',      roles: ['FLEET_MANAGER', 'DISPATCHER'] },
-      { label: 'Drivers',    icon: Users,       href: '/drivers',    roles: ['FLEET_MANAGER', 'DISPATCHER'] },
+      { label: 'Vehicles',    icon: Truck,       href: '/vehicles',    roles: ['FLEET_MANAGER', 'DISPATCHER'] },
+      { label: 'Trips',       icon: Route,       href: '/trips',       roles: ['FLEET_MANAGER', 'DISPATCHER'] },
+      { label: 'Maintenance', icon: Wrench,      href: '/maintenance', roles: ['FLEET_MANAGER', 'DISPATCHER'] },
+      { label: 'Drivers',     icon: Users,       href: '/drivers',     roles: ['FLEET_MANAGER', 'DISPATCHER'] },
     ],
   },
   {
     section: 'Compliance',
     items: [
-      { label: 'Safety',     icon: ShieldCheck, href: '/safety',     roles: ['SAFETY_OFFICER', 'FLEET_MANAGER'] },
+      { label: 'Analytics',    icon: BarChart3,   href: '/analytics',   roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
+      { label: 'AI Insights',  icon: Zap,         href: '/ai-insights', roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
     ],
   },
   {
     section: 'Finance',
     items: [
-      { label: 'Financials', icon: BarChart3,   href: '/financials', roles: ['FINANCIAL_ANALYST'] },
+      { label: 'Expenses',     icon: DollarSign,  href: '/expenses',    roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST'] },
+      { label: 'Fuel Logbook', icon: Fuel,        href: '/fuel-logs',   roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST'] },
     ],
   },
   {
     section: 'System',
     items: [
-      { label: 'Settings',   icon: Settings,    href: '/settings',   roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
+      { label: 'Settings',     icon: Settings,    href: '/settings',    roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
     ],
   },
 ];

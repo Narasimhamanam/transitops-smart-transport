@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { login as loginApi, getProfile } from '../services/auth.service';
+import { login as loginApi, register as registerApi, getProfile } from '../services/auth.service';
 
 const TOKEN_KEY = 'transitops_token';
 const USER_KEY  = 'transitops_user';
@@ -55,6 +55,18 @@ export function AuthProvider({ children }) {
     return newUser;
   }, []);
 
+  const registerUser = useCallback(async (payload) => {
+    const { data } = await registerApi(payload);
+    const { token: newToken, user: newUser } = data;
+
+    localStorage.setItem(TOKEN_KEY, newToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+    setToken(newToken);
+    setUser(newUser);
+
+    return newUser;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
@@ -69,6 +81,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!token && !!user,
     login,
     logout,
+    registerUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

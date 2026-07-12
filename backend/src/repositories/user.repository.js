@@ -21,9 +21,28 @@ const findById = async (id) => {
       name: true,
       role: true,
       isActive: true,
+      lastLogin: true,
       createdAt: true,
       updatedAt: true,
     },
+  });
+};
+
+/**
+ * Find a user by ID including password (for changing password).
+ * @param {string} id
+ */
+const findByEmailById = async (id) => {
+  return prisma.user.findUnique({ where: { id } });
+};
+
+/**
+ * Find a user by reset token.
+ * @param {string} resetToken
+ */
+const findByResetToken = async (resetToken) => {
+  return prisma.user.findFirst({
+    where: { resetToken },
   });
 };
 
@@ -40,6 +59,7 @@ const create = async (data) => {
       name: true,
       role: true,
       isActive: true,
+      lastLogin: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -61,10 +81,11 @@ const update = async (id, data) => {
       name: true,
       role: true,
       isActive: true,
+      lastLogin: true,
       createdAt: true,
       updatedAt: true,
     },
   });
 };
 
-module.exports = { findByEmail, findById, create, update };
+module.exports = { findByEmail, findById, findByEmailById, findByResetToken, create, update };

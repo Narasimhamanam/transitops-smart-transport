@@ -1,5 +1,5 @@
 const authService = require('../services/auth.service');
-const { successResponse, errorResponse } = require('../utils/response.util');
+const { successResponse } = require('../utils/response.util');
 
 /**
  * POST /api/auth/login
@@ -32,4 +32,41 @@ const getMe = async (req, res) => {
   return successResponse(res, user, 'Profile retrieved successfully.');
 };
 
-module.exports = { login, register, getMe };
+/**
+ * PUT /api/auth/change-password
+ * Changes the authenticated user's password.
+ */
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  await authService.changePassword(req.user.id, oldPassword, newPassword);
+  return successResponse(res, null, 'Password changed successfully.');
+};
+
+/**
+ * POST /api/auth/forgot-password
+ * Generates and logs a reset token for the given email.
+ */
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  await authService.forgotPassword(email);
+  return successResponse(res, null, 'If the email exists, a password reset link has been logged/sent.');
+};
+
+/**
+ * POST /api/auth/reset-password
+ * Resets password using a valid token.
+ */
+const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+  await authService.resetPassword(token, password);
+  return successResponse(res, null, 'Password reset successfully. You can now log in with your new password.');
+};
+
+module.exports = {
+  login,
+  register,
+  getMe,
+  changePassword,
+  forgotPassword,
+  resetPassword,
+};
