@@ -422,7 +422,7 @@ export default function Dashboard() {
   });
 
   // Only fetch data needed for the current role
-  const { data: tripsResponse }   = useQuery({ queryKey: ['trips'],        queryFn: () => getTrips(),        enabled: ['FLEET_MANAGER','DISPATCHER'].includes(role) });
+  const { data: tripsResponse }   = useQuery({ queryKey: ['trips'],        queryFn: () => getTrips(),        enabled: role === 'DISPATCHER' });
   const { data: mntResponse }     = useQuery({ queryKey: ['maintenances'], queryFn: () => getMaintenances(), enabled: role === 'FLEET_MANAGER' });
   const { data: fuelResponse }    = useQuery({ queryKey: ['fuel-logs'],    queryFn: () => getFuelLogs(),     enabled: role === 'FINANCIAL_ANALYST' });
   const { data: expResponse }     = useQuery({ queryKey: ['expenses'],     queryFn: () => getExpenses(),     enabled: role === 'FINANCIAL_ANALYST' });
