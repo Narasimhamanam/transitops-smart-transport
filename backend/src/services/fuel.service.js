@@ -1,6 +1,7 @@
 const fuelRepository = require('../repositories/fuel.repository');
 const vehicleRepository = require('../repositories/vehicle.repository');
 const tripRepository = require('../repositories/trip.repository');
+const expenseRepository = require('../repositories/expense.repository');
 
 const getAll = async (filters) => {
   return fuelRepository.findAll(filters);
@@ -42,6 +43,17 @@ const create = async (data) => {
     ...data,
     totalCost,
   });
+
+  // If tripId is provided, automatically log a corresponding trip expense
+  if (log.tripId) {
+    await expenseRepository.create({
+      tripId: log.tripId,
+      expenseType: 'MISCELLANEOUS',
+      amount: log.totalCost,
+      description: `[Fuel Log #${log.id}] Refuel at ${log.fuelStation}`,
+      expenseDate: log.fuelDate,
+    });
+  }
 
   // Update vehicle's current odometer reading
   await vehicleRepository.update(vehicle.id, { odometer: data.odometerReading });
@@ -85,6 +97,36 @@ const update = async (id, data) => {
     totalCost,
   });
 
+  // If tripId is provided, sync the corresponding expense
+  if (updatedLog.tripId) {
+    const existingExpenses = await expenseRepository.findAll({ tripId: updatedLog.tripId });
+    const fuelExpense = existingExpenses.find(e => e.description.includes(`[Fuel Log #${updatedLog.id}]`));
+    
+    if (fuelExpense) {
+      await expenseRepository.update(fuelExpense.id, {
+        amount: updatedLog.totalCost,
+        description: `[Fuel Log #${updatedLog.id}] Refuel at ${updatedLog.fuelStation}`,
+        expenseDate: updatedLog.fuelDate,
+      });
+    } else {
+      // If trip was added during update
+      await expenseRepository.create({
+        tripId: updatedLog.tripId,
+        expenseType: 'MISCELLANEOUS',
+        amount: updatedLog.totalCost,
+        description: `[Fuel Log #${updatedLog.id}] Refuel at ${updatedLog.fuelStation}`,
+        expenseDate: updatedLog.fuelDate,
+      });
+    }
+  } else {
+    // If trip was removed during update, delete the corresponding expense if it exists
+    const allExpenses = await expenseRepository.findAll();
+    const fuelExpense = allExpenses.find(e => e.description.includes(`[Fuel Log #${updatedLog.id}]`));
+    if (fuelExpense) {
+      await expenseRepository.remove(fuelExpense.id);
+    }
+  }
+
   // Update vehicle odometer if it is larger than current
   const newOdo = data.odometerReading !== undefined ? data.odometerReading : record.odometerReading;
   if (newOdo > vehicle.odometer) {
@@ -99,6 +141,13 @@ const remove = async (id) => {
   if (!record) {
     throw Object.assign(new Error('Fuel log record not found.'), { statusCode: 404 });
   }
+  // Remove corresponding expense if it exists
+  const allExpenses = await expenseRepository.findAll();
+  const fuelExpense = allExpenses.find(e => e.description.includes(`[Fuel Log #${id}]`));
+  if (fuelExpense) {
+    await expenseRepository.remove(fuelExpense.id);
+  }
+
   return fuelRepository.remove(id);
 };
 
