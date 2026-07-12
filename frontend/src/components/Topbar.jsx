@@ -1,5 +1,6 @@
+import NotificationDropdown from './NotificationDropdown';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bell, LogOut, ChevronDown, Search } from 'lucide-react';
+import { LogOut, ChevronDown, Search } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
 import { cn } from '../utils/cn';
@@ -71,11 +72,8 @@ export default function Topbar({ collapsed }) {
         />
       </div>
 
-      {/* Notifications */}
-      <button className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-800 transition-colors mr-2 text-slate-400 hover:text-slate-200">
-        <Bell className="w-4.5 h-4.5" />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger-500 rounded-full ring-2 ring-surface-950" />
-      </button>
+      {/* Notifications Dropdown */}
+      <NotificationDropdown />
 
       {/* User dropdown */}
       <div className="relative">

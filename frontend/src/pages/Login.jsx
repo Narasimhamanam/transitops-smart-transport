@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -140,7 +140,12 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="form-label">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="password" className="form-label mb-0">Password</label>
+                <Link to="/forgot-password" className="text-brand-400 hover:text-brand-300 text-xs font-semibold transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   id="password"
@@ -185,27 +190,13 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demo credentials */}
-          <div className="mt-8 p-4 bg-surface-900 rounded-xl border border-slate-800">
-            <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">Demo Credentials</p>
-            <div className="space-y-2">
-              {[
-                { role: 'Fleet Manager',    email: 'fleet@transitops.com' },
-                { role: 'Dispatcher',       email: 'dispatcher@transitops.com' },
-                { role: 'Safety Officer',   email: 'safety@transitops.com' },
-                { role: 'Financial Analyst',email: 'finance@transitops.com' },
-              ].map((d) => (
-                <div key={d.email} className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">{d.role}</span>
-                  <span className="text-slate-500 font-mono">{d.email}</span>
-                </div>
-              ))}
-              <div className="border-t border-slate-800 pt-2 mt-2 flex items-center justify-between text-xs">
-                <span className="text-slate-400">Password (all)</span>
-                <span className="text-brand-400 font-mono">Transit@123</span>
-              </div>
-            </div>
-          </div>
+          {/* Sign up link */}
+          <p className="mt-8 text-center text-slate-400 text-sm">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>
