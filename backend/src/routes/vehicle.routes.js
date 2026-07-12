@@ -13,8 +13,8 @@ router.post(  '/',    authorize('FLEET_MANAGER'), validate(createVehicleSchema),
 router.put(   '/:id', authorize('FLEET_MANAGER'), validate(updateVehicleSchema), vehicleController.update);
 router.delete('/:id', authorize('FLEET_MANAGER'), vehicleController.remove);
 
-// Fleet Manager, Driver (DISPATCHER), and Financial Analyst can read vehicles
-router.get(   '/',    authorize('FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'), vehicleController.findAll);
-router.get(   '/:id', authorize('FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'), vehicleController.findById);
+// Fleet Manager and Driver (DISPATCHER) can read vehicles
+router.get(   '/',    authorize('FLEET_MANAGER', 'DISPATCHER'), vehicleController.findAll);
+router.get(   '/:id', authorize('FLEET_MANAGER', 'DISPATCHER'), vehicleController.findById);
 
 module.exports = router;

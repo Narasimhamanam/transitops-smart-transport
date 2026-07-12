@@ -11,24 +11,28 @@ export const ROLE_LABELS = {
 };
 
 export const ROLE_MODULES = {
-  FLEET_MANAGER: ['dashboard', 'vehicles', 'maintenance', 'analytics', 'ai-insights', 'settings'],
+  FLEET_MANAGER: ['dashboard', 'vehicles', 'maintenance', 'drivers'],
   DISPATCHER:    ['dashboard', 'trips'],
   SAFETY_OFFICER:['dashboard', 'drivers'],
-  FINANCIAL_ANALYST: ['dashboard', 'fuel-logs', 'expenses', 'analytics'],
+  FINANCIAL_ANALYST: ['dashboard', 'fuel-logs', 'expenses', 'maintenance', 'analytics'],
 };
 
 export const MODULE_PERMISSIONS = {
   vehicles: {
     FLEET_MANAGER:    { canRead: true, canCreate: true, canEdit: true, canDelete: true },
+    DISPATCHER:       { canRead: true, canCreate: false, canEdit: false, canDelete: false },
   },
   drivers: {
-    SAFETY_OFFICER:   { canRead: true, canCreate: false, canEdit: true, canDelete: false }, // Safety Officer can edit safety score & status, but not create/delete
+    FLEET_MANAGER:    { canRead: true, canCreate: true, canEdit: true, canDelete: true },
+    SAFETY_OFFICER:   { canRead: true, canCreate: false, canEdit: true, canDelete: false },
+    DISPATCHER:       { canRead: true, canCreate: false, canEdit: false, canDelete: false },
   },
   trips: {
     DISPATCHER:       { canRead: true, canCreate: true, canEdit: true, canDelete: true },
   },
   maintenance: {
     FLEET_MANAGER:    { canRead: true, canCreate: true, canEdit: true, canDelete: true },
+    FINANCIAL_ANALYST:{ canRead: true, canCreate: false, canEdit: false, canDelete: false },
   },
   'fuel-logs': {
     FINANCIAL_ANALYST:{ canRead: true, canCreate: true, canEdit: true, canDelete: true },
@@ -37,15 +41,11 @@ export const MODULE_PERMISSIONS = {
     FINANCIAL_ANALYST:{ canRead: true, canCreate: true, canEdit: true, canDelete: true },
   },
   analytics: {
-    FLEET_MANAGER:    { canRead: true, canCreate: false, canEdit: false, canDelete: false },
-    SAFETY_OFFICER:   { canRead: false, canCreate: false, canEdit: false, canDelete: false }, // No analytics for Safety Officer
     FINANCIAL_ANALYST:{ canRead: true, canCreate: false, canEdit: false, canDelete: false },
   },
   'ai-insights': {
-    FLEET_MANAGER:    { canRead: true, canCreate: false, canEdit: false, canDelete: false },
   },
   settings: {
-    FLEET_MANAGER:    { canRead: true, canCreate: true, canEdit: true, canDelete: true },
   },
 };
 
@@ -74,6 +74,7 @@ export const DASHBOARD_QUICK_ACTIONS = {
   FLEET_MANAGER: [
     { label: 'Add Vehicle',          href: '/vehicles',    icon: 'Truck'   },
     { label: 'Schedule Maintenance', href: '/maintenance', icon: 'Wrench'  },
+    { label: 'Add Driver',           href: '/drivers',     icon: 'UserPlus'},
   ],
   DISPATCHER: [
     { label: 'Create Trip', href: '/trips', icon: 'Route' },

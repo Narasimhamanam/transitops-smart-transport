@@ -8,10 +8,10 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post(  '/',    authorize('FLEET_MANAGER', 'FINANCIAL_ANALYST'), validate(createExpenseSchema), expenseController.create);
-router.get(   '/',                                   expenseController.findAll);
-router.get(   '/:id',                                expenseController.findById);
-router.put(   '/:id', authorize('FLEET_MANAGER', 'FINANCIAL_ANALYST'), validate(updateExpenseSchema), expenseController.update);
-router.delete('/:id', authorize('FLEET_MANAGER', 'FINANCIAL_ANALYST'),                                expenseController.remove);
+router.post(  '/',    authorize('FINANCIAL_ANALYST'), validate(createExpenseSchema), expenseController.create);
+router.get(   '/',    authorize('FINANCIAL_ANALYST'), expenseController.findAll);
+router.get(   '/:id', authorize('FINANCIAL_ANALYST'), expenseController.findById);
+router.put(   '/:id', authorize('FINANCIAL_ANALYST'), validate(updateExpenseSchema), expenseController.update);
+router.delete('/:id', authorize('FINANCIAL_ANALYST'), expenseController.remove);
 
 module.exports = router;

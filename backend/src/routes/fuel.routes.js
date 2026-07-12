@@ -6,8 +6,8 @@ const { createFuelLogSchema, updateFuelLogSchema } = require('../validators/fuel
 
 const router = Router();
 
-// Fleet Manager + Financial Analyst manage fuel logs
-const FUEL_ROLES = ['FLEET_MANAGER', 'FINANCIAL_ANALYST'];
+// Financial Analyst manages fuel logs
+const FUEL_ROLES = ['FINANCIAL_ANALYST'];
 
 router.use(authenticate);
 
