@@ -8,14 +8,18 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post(  '/',          authorize('FLEET_MANAGER', 'DISPATCHER'), validate(createTripSchema), tripController.create);
-router.get(   '/',                                      tripController.findAll);
-router.get(   '/:id',                                   tripController.findById);
-router.put(   '/:id',       authorize('FLEET_MANAGER', 'DISPATCHER'), validate(updateTripSchema), tripController.update);
-router.delete('/:id',       authorize('FLEET_MANAGER', 'DISPATCHER'),                               tripController.remove);
+// Only Fleet Manager and Driver (DISPATCHER) can write trip data
+const WRITE_ROLES = ['FLEET_MANAGER', 'DISPATCHER'];
+router.post(  '/',          authorize(...WRITE_ROLES), validate(createTripSchema), tripController.create);
+router.put(   '/:id',       authorize(...WRITE_ROLES), validate(updateTripSchema), tripController.update);
+router.delete('/:id',       authorize(...WRITE_ROLES),                             tripController.remove);
 
-router.post(  '/:id/dispatch', authorize('FLEET_MANAGER', 'DISPATCHER'),                          tripController.dispatchTrip);
-router.post(  '/:id/complete', authorize('FLEET_MANAGER', 'DISPATCHER'),                          tripController.completeTrip);
-router.post(  '/:id/cancel',   authorize('FLEET_MANAGER', 'DISPATCHER'),                          tripController.cancelTrip);
+router.post(  '/:id/dispatch', authorize(...WRITE_ROLES), tripController.dispatchTrip);
+router.post(  '/:id/complete', authorize(...WRITE_ROLES), tripController.completeTrip);
+router.post(  '/:id/cancel',   authorize(...WRITE_ROLES), tripController.cancelTrip);
+
+// Fleet Manager, Driver (DISPATCHER), and Financial Analyst can read trip data
+router.get(   '/',                                    authorize('FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'), tripController.findAll);
+router.get(   '/:id',                                 authorize('FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'), tripController.findById);
 
 module.exports = router;

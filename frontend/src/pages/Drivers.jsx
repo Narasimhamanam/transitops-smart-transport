@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { usePermission } from '../hooks/usePermission';
 
 import PageHeader     from '../components/ui/PageHeader';
 import SearchBar      from '../components/ui/SearchBar';
@@ -38,6 +39,8 @@ const driverFormSchema = z.object({
 
 function DriverFormModal({ isOpen, onClose, editDriver, onSuccess }) {
   const isEdit = !!editDriver;
+  const { role } = usePermission();
+  const isSafetyOfficer = role === 'SAFETY_OFFICER';
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(driverFormSchema),
@@ -80,19 +83,19 @@ function DriverFormModal({ isOpen, onClose, editDriver, onSuccess }) {
       <form id="driver-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <Field id="fullName" label="Full Name *" error={errors.fullName}>
-            <input id="fullName" className="form-input" placeholder="James Cooper" {...register('fullName')} />
+            <input id="fullName" className="form-input read-only:bg-slate-800/50 read-only:cursor-not-allowed" placeholder="James Cooper" readOnly={isSafetyOfficer} {...register('fullName')} />
           </Field>
           <Field id="contactNumber" label="Contact Number *" error={errors.contactNumber}>
-            <input id="contactNumber" className="form-input" placeholder="+27-83-001-0001" {...register('contactNumber')} />
+            <input id="contactNumber" className="form-input read-only:bg-slate-800/50 read-only:cursor-not-allowed" placeholder="+27-83-001-0001" readOnly={isSafetyOfficer} {...register('contactNumber')} />
           </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Field id="licenseNumber" label="License Number *" error={errors.licenseNumber}>
-            <input id="licenseNumber" className="form-input" placeholder="DL-10001" {...register('licenseNumber')} />
+            <input id="licenseNumber" className="form-input read-only:bg-slate-800/50 read-only:cursor-not-allowed" placeholder="DL-10001" readOnly={isSafetyOfficer} {...register('licenseNumber')} />
           </Field>
           <Field id="licenseCategory" label="License Category *" error={errors.licenseCategory}>
-            <select id="licenseCategory" className="form-input" {...register('licenseCategory')}>
+            <select id="licenseCategory" className="form-input disabled:bg-slate-800/50 disabled:cursor-not-allowed" disabled={isSafetyOfficer} {...register('licenseCategory')}>
               {LICENSE_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </Field>
@@ -100,7 +103,7 @@ function DriverFormModal({ isOpen, onClose, editDriver, onSuccess }) {
 
         <div className="grid grid-cols-3 gap-4">
           <Field id="licenseExpiry" label="License Expiry *" error={errors.licenseExpiry}>
-            <input id="licenseExpiry" type="date" className="form-input" {...register('licenseExpiry')} />
+            <input id="licenseExpiry" type="date" className="form-input read-only:bg-slate-800/50 read-only:cursor-not-allowed" readOnly={isSafetyOfficer} {...register('licenseExpiry')} />
           </Field>
           <Field id="safetyScore" label="Safety Score (0–100)" error={errors.safetyScore}>
             <input id="safetyScore" type="number" className="form-input" min={0} max={100} placeholder="100" {...register('safetyScore')} />
@@ -128,6 +131,10 @@ function DriverFormModal({ isOpen, onClose, editDriver, onSuccess }) {
 export default function Drivers() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { canCreateModule, canEditModule, canDeleteModule } = usePermission();
+  const canCreate = canCreateModule('drivers');
+  const canEdit = canEditModule('drivers');
+  const canDelete = canDeleteModule('drivers');
   const { toast, showToast, clearToast } = useToast();
 
   const [search, setSearch]             = useState('');
@@ -203,8 +210,8 @@ export default function Drivers() {
       render: (d) => (
         <div className="flex items-center justify-end gap-1">
           <button onClick={() => navigate(`/drivers/${d.id}`)} className="btn-ghost p-2" title="View Details"><Eye className="w-4 h-4" /></button>
-          <button onClick={() => { setEditDriver(d); setShowForm(true); }} className="btn-ghost p-2" title="Edit"><Pencil className="w-4 h-4" /></button>
-          <button onClick={() => setDeleteTarget(d)} className="btn-ghost p-2 text-danger-400 hover:text-danger-300 hover:bg-danger-500/10" title="Delete"><Trash2 className="w-4 h-4" /></button>
+          {canEdit && <button onClick={() => { setEditDriver(d); setShowForm(true); }} className="btn-ghost p-2" title="Edit"><Pencil className="w-4 h-4" /></button>}
+          {canDelete && <button onClick={() => setDeleteTarget(d)} className="btn-ghost p-2 text-danger-400 hover:text-danger-300 hover:bg-danger-500/10" title="Delete"><Trash2 className="w-4 h-4" /></button>}
         </div>
       ),
     },
@@ -215,7 +222,7 @@ export default function Drivers() {
       <PageHeader
         title="Drivers"
         subtitle={`${filteredDrivers.length} driver${filteredDrivers.length !== 1 ? 's' : ''} found`}
-        action={
+        action={canCreate ? (
           <button
             id="add-driver-btn"
             onClick={() => { setEditDriver(null); setShowForm(true); }}
@@ -224,7 +231,7 @@ export default function Drivers() {
             <Plus className="w-4 h-4" />
             Add Driver
           </button>
-        }
+        ) : null}
       />
 
       <div className="card p-5">
@@ -274,6 +281,6 @@ export default function Drivers() {
       />
 
       <Toast toast={toast} onDismiss={clearToast} />
-    </div>
   );
 }
+

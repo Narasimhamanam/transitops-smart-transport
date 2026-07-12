@@ -170,7 +170,7 @@ export default function Register() {
               >
                 <option value="" disabled>Select a role...</option>
                 <option value="FLEET_MANAGER">Fleet Manager</option>
-                <option value="DISPATCHER">Dispatcher</option>
+                <option value="DISPATCHER">Driver</option>
                 <option value="SAFETY_OFFICER">Safety Officer</option>
                 <option value="FINANCIAL_ANALYST">Financial Analyst</option>
               </select>

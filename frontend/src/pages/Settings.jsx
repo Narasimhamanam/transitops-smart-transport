@@ -47,7 +47,7 @@ export default function Settings() {
 
   const ROLE_LABELS = {
     FLEET_MANAGER:    'Fleet Manager (Full control over assets, dispatches, and finance)',
-    DISPATCHER:       'Dispatcher (Create and dispatch operational trips)',
+    DISPATCHER:       'Driver (Create and dispatch operational trips)',
     SAFETY_OFFICER:   'Safety Officer (Inspect driver safety indexes and licenses)',
     FINANCIAL_ANALYST:'Financial Analyst (View financial and fuel metrics logs)',
   };

@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { usePermission } from '../hooks/usePermission';
 
 import PageHeader     from '../components/ui/PageHeader';
 import SearchBar      from '../components/ui/SearchBar';
@@ -130,6 +131,10 @@ function VehicleFormModal({ isOpen, onClose, editVehicle, onSuccess }) {
 export default function Vehicles() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { canCreateModule, canEditModule, canDeleteModule } = usePermission();
+  const canCreate = canCreateModule('vehicles');
+  const canEdit = canEditModule('vehicles');
+  const canDelete = canDeleteModule('vehicles');
   const { toast, showToast, clearToast } = useToast();
 
   const [search, setSearch]               = useState('');
@@ -197,8 +202,8 @@ export default function Vehicles() {
       render: (v) => (
         <div className="flex items-center justify-end gap-1">
           <button onClick={() => navigate(`/vehicles/${v.id}`)} className="btn-ghost p-2" title="View Details"><Eye className="w-4 h-4" /></button>
-          <button onClick={() => { setEditVehicle(v); setShowForm(true); }} className="btn-ghost p-2" title="Edit"><Pencil className="w-4 h-4" /></button>
-          <button onClick={() => setDeleteTarget(v)} className="btn-ghost p-2 text-danger-400 hover:text-danger-300 hover:bg-danger-500/10" title="Delete"><Trash2 className="w-4 h-4" /></button>
+          {canEdit && <button onClick={() => { setEditVehicle(v); setShowForm(true); }} className="btn-ghost p-2" title="Edit"><Pencil className="w-4 h-4" /></button>}
+          {canDelete && <button onClick={() => setDeleteTarget(v)} className="btn-ghost p-2 text-danger-400 hover:text-danger-300 hover:bg-danger-500/10" title="Delete"><Trash2 className="w-4 h-4" /></button>}
         </div>
       ),
     },
@@ -219,7 +224,7 @@ export default function Vehicles() {
       <PageHeader
         title="Fleet Vehicles"
         subtitle={`${filteredVehicles.length} vehicle${filteredVehicles.length !== 1 ? 's' : ''} found`}
-        action={
+        action={canCreate ? (
           <button
             id="add-vehicle-btn"
             onClick={() => { setEditVehicle(null); setShowForm(true); }}
@@ -228,7 +233,7 @@ export default function Vehicles() {
             <Plus className="w-4 h-4" />
             Add Vehicle
           </button>
-        }
+        ) : null}
       />
 
       <div className="card p-5">

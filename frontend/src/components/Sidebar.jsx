@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   Truck,
@@ -14,61 +14,57 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
+import { ROLE_LABELS, ROLE_MODULES } from '../config/permissions';
 
-const ALL_NAV_ITEMS = [
-  {
-    section: 'Overview',
-    items: [
-      { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    ],
-  },
-  {
-    section: 'Operations',
-    items: [
-      { label: 'Vehicles',    icon: Truck,       href: '/vehicles',    roles: ['FLEET_MANAGER', 'DISPATCHER'] },
-      { label: 'Trips',       icon: Route,       href: '/trips',       roles: ['FLEET_MANAGER', 'DISPATCHER'] },
-      { label: 'Maintenance', icon: Wrench,      href: '/maintenance', roles: ['FLEET_MANAGER', 'DISPATCHER'] },
-      { label: 'Drivers',     icon: Users,       href: '/drivers',     roles: ['FLEET_MANAGER', 'DISPATCHER'] },
-    ],
-  },
-  {
-    section: 'Compliance',
-    items: [
-      { label: 'Analytics',    icon: BarChart3,   href: '/analytics',   roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-      { label: 'AI Insights',  icon: Zap,         href: '/ai-insights', roles: ['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    ],
-  },
-  {
-    section: 'Finance',
-    items: [
-      { label: 'Expenses',     icon: DollarSign,  href: '/expenses',    roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST'] },
-      { label: 'Fuel Logbook', icon: Fuel,        href: '/fuel-logs',   roles: ['FLEET_MANAGER', 'FINANCIAL_ANALYST'] },
-    ],
-  },
-  {
-    section: 'System',
-    items: [
-      { label: 'Settings',     icon: Settings,    href: '/settings',    roles: ['FLEET_MANAGER', 'DISPATCHER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    ],
-  },
-];
-
-const ROLE_LABELS = {
-  FLEET_MANAGER:    'Fleet Manager',
-  DISPATCHER:       'Dispatcher',
-  SAFETY_OFFICER:   'Safety Officer',
-  FINANCIAL_ANALYST:'Financial Analyst',
+// Icon map by module slug
+const MODULE_ICONS = {
+  dashboard:   LayoutDashboard,
+  vehicles:    Truck,
+  trips:       Route,
+  drivers:     Users,
+  maintenance: Wrench,
+  'fuel-logs': Fuel,
+  expenses:    DollarSign,
+  analytics:   BarChart3,
+  'ai-insights': Zap,
+  settings:    Settings,
 };
+
+// Human-readable labels by module slug
+const MODULE_LABELS = {
+  dashboard:     'Dashboard',
+  vehicles:      'Vehicles',
+  trips:         'Trips',
+  drivers:       'Drivers',
+  maintenance:   'Maintenance',
+  'fuel-logs':   'Fuel Logbook',
+  expenses:      'Expenses',
+  analytics:     'Analytics',
+  'ai-insights': 'AI Insights',
+  settings:      'Settings',
+};
+
+// Section groupings (order matters — first matching group wins)
+const SECTIONS = [
+  { label: 'Overview',    modules: ['dashboard'] },
+  { label: 'Operations',  modules: ['vehicles', 'trips', 'drivers', 'maintenance'] },
+  { label: 'Finance',     modules: ['fuel-logs', 'expenses'] },
+  { label: 'Compliance',  modules: ['analytics', 'ai-insights'] },
+  { label: 'System',      modules: ['settings'] },
+];
 
 export default function Sidebar({ collapsed, onToggle }) {
   const { user } = useAuth();
+  const role = user?.role;
+  const allowedModules = ROLE_MODULES[role] ?? [];
 
-  const filteredNav = ALL_NAV_ITEMS
-    .map((section) => ({
-      ...section,
-      items: section.items.filter((item) => item.roles.includes(user?.role)),
+  // Build filtered sections — only include sections that have ≥1 allowed module
+  const filteredSections = SECTIONS
+    .map((sec) => ({
+      ...sec,
+      items: sec.modules.filter((m) => allowedModules.includes(m)),
     }))
-    .filter((section) => section.items.length > 0);
+    .filter((sec) => sec.items.length > 0);
 
   return (
     <aside
@@ -97,24 +93,28 @@ export default function Sidebar({ collapsed, onToggle }) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
-        {filteredNav.map((section) => (
-          <div key={section.section}>
+        {filteredSections.map((section) => (
+          <div key={section.label}>
             {!collapsed && (
-              <p className="section-title">{section.section}</p>
+              <p className="section-title">{section.label}</p>
             )}
-            {section.items.map((item) => (
-              <NavLink
-                key={item.href}
-                to={item.href}
-                className={({ isActive }) =>
-                  cn(isActive ? 'nav-item-active' : 'nav-item', 'mb-0.5', collapsed && 'justify-center px-0')
-                }
-                title={collapsed ? item.label : undefined}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && <span className="animate-in">{item.label}</span>}
-              </NavLink>
-            ))}
+            {section.items.map((moduleSlug) => {
+              const Icon = MODULE_ICONS[moduleSlug];
+              const label = MODULE_LABELS[moduleSlug];
+              return (
+                <NavLink
+                  key={moduleSlug}
+                  to={`/${moduleSlug}`}
+                  className={({ isActive }) =>
+                    cn(isActive ? 'nav-item-active' : 'nav-item', 'mb-0.5', collapsed && 'justify-center px-0')
+                  }
+                  title={collapsed ? label : undefined}
+                >
+                  {Icon && <Icon className="w-5 h-5 flex-shrink-0" />}
+                  {!collapsed && <span className="animate-in">{label}</span>}
+                </NavLink>
+              );
+            })}
           </div>
         ))}
       </nav>
@@ -133,7 +133,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-slate-200 text-sm font-semibold truncate">{user?.name}</p>
-              <p className="text-slate-500 text-xs truncate">{ROLE_LABELS[user?.role]}</p>
+              <p className="text-slate-500 text-xs truncate">{ROLE_LABELS[role] ?? role}</p>
             </div>
           </div>
         ) : (

@@ -215,16 +215,15 @@ export default function Trips() {
   const vehicles = vehiclesResponse?.data ?? [];
   const drivers = driversResponse?.data ?? [];
 
-  // Filtered trips
   const filteredTrips = useMemo(() => {
     return trips.filter((t) => {
       const q = search.toLowerCase();
       const matchSearch = !search ||
-        t.tripNumber.toLowerCase().includes(q) ||
-        t.source.toLowerCase().includes(q) ||
-        t.destination.toLowerCase().includes(q) ||
-        t.driver.fullName.toLowerCase().includes(q) ||
-        t.vehicle.registrationNumber.toLowerCase().includes(q);
+        (t.tripNumber && t.tripNumber.toLowerCase().includes(q)) ||
+        (t.source && t.source.toLowerCase().includes(q)) ||
+        (t.destination && t.destination.toLowerCase().includes(q)) ||
+        (t.driver?.fullName && t.driver.fullName.toLowerCase().includes(q)) ||
+        (t.vehicle?.registrationNumber && t.vehicle.registrationNumber.toLowerCase().includes(q));
 
       const matchStatus = !statusFilter  || t.status === statusFilter;
       const matchVehicle = !vehicleFilter || t.vehicleId === vehicleFilter;
@@ -234,6 +233,7 @@ export default function Trips() {
       return matchSearch && matchStatus && matchVehicle && matchDriver && matchDate;
     });
   }, [trips, search, statusFilter, vehicleFilter, driverFilter, dateFilter]);
+
 
   const paginatedTrips = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;

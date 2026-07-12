@@ -14,7 +14,7 @@ const ROLE_BADGE_COLORS = {
 
 const ROLE_LABELS = {
   FLEET_MANAGER:    'Fleet Manager',
-  DISPATCHER:       'Dispatcher',
+  DISPATCHER:       'Driver',
   SAFETY_OFFICER:   'Safety Officer',
   FINANCIAL_ANALYST:'Financial Analyst',
 };
