@@ -5,7 +5,7 @@ services:
     env: node
     plan: free
     rootDir: backend
-    buildCommand: npm install
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
     startCommand: npm start
     envVars:
       - key: PORT
@@ -21,7 +21,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        value: https://transitops-frontend.onrender.com
+        value: https://transitops-frontend-kkjn.onrender.com
 
   # Frontend static client environment
   - type: web
@@ -30,6 +30,9 @@ services:
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://transitops-backend-rt9e.onrender.com/api
     headers:
       - path: /*
         name: Cache-Control
