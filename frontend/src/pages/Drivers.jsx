@@ -279,8 +279,7 @@ export default function Drivers() {
         entityName={deleteTarget ? `${deleteTarget.fullName} (${deleteTarget.licenseNumber})` : ''}
         isDeleting={deleteMutation.isPending}
       />
-
-      <Toast toast={toast} onDismiss={clearToast} />
+    </div>
   );
 }
 
