@@ -18,8 +18,8 @@ router.post(  '/:id/dispatch', authorize(...WRITE_ROLES), tripController.dispatc
 router.post(  '/:id/complete', authorize(...WRITE_ROLES), tripController.completeTrip);
 router.post(  '/:id/cancel',   authorize(...WRITE_ROLES), tripController.cancelTrip);
 
-// Only Driver (DISPATCHER) can read trip data
-router.get(   '/',                                    authorize('DISPATCHER'), tripController.findAll);
-router.get(   '/:id',                                 authorize('DISPATCHER'), tripController.findById);
+// Only Driver (DISPATCHER) can read trip data; Financial Analyst can read for expense linkage
+router.get(   '/',    authorize('DISPATCHER', 'FINANCIAL_ANALYST'), tripController.findAll);
+router.get(   '/:id', authorize('DISPATCHER', 'FINANCIAL_ANALYST'), tripController.findById);
 
 module.exports = router;
