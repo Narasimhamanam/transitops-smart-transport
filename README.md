@@ -1,127 +1,307 @@
-# TransitOps Transport ERP
+# 🚛 TransitOps – Smart Transport Operations Platform
 
-TransitOps is a production-quality, enterprise-grade Transport Enterprise Resource Planning (ERP) application developed for Odoo Hackathon 2026. It enables complete operations management for fleets, including vehicles, drivers, trip dispatches, maintenance logging, fuel tracking, finance expenses, live analytics charts, and compliance AI fleet insights.
+## Odoo Hackathon 2026 Submission
 
----
+TransitOps is a full-stack Transport Operations Platform developed for the **Odoo Hackathon 2026**.
 
-## Technical Stack
+The application digitizes transport operations by providing a centralized platform to manage vehicles, drivers, trip dispatches, maintenance logging, fuel tracking, operational expenses, authentication with role-based access control, and live operational analytics.
 
-### Frontend
-- **Framework**: React (Vite)
-- **State Management**: TanStack Query (React Query)
-- **Forms**: React Hook Form with Zod schema validations
-- **Visuals**: Recharts (Interactive SVG Charts) and Lucide Icons
-- **Design System**: Shadcn/ui & TailwindCSS (Dark ERP mockup theme)
-
-### Backend
-- **Platform**: Node.js & Express
-- **Database**: PostgreSQL (Neon Cloud for dev, Render in production)
-- **ORM**: Prisma ORM
-- **Authentication**: JWT & Bcrypt password hashing
-- **Input Validation**: Zod middleware
+The system follows the official hackathon problem statement and enforces real-world business rules to improve fleet efficiency, operational visibility, and compliance.
 
 ---
 
-## Folder Structure
+# Problem Statement
+
+Many logistics companies still rely on spreadsheets and manual records to manage transport operations, leading to:
+
+- Scheduling conflicts
+- Vehicle underutilization
+- Missed maintenance
+- Expired driver licenses
+- Inaccurate fuel and expense tracking
+- Limited operational visibility
+
+TransitOps addresses these challenges by providing a centralized web application that manages the complete transport lifecycle.
+
+---
+
+# Team
+
+**Odoo Hackathon 2026**
+
+Team Members & Core Contributions:
+
+- **Narasimha** (Role: Full-Stack Developer - Frontend Integration & Backend Security Architecture)
+- **Pravallika** (Role: Backend & DB Developer - Prisma ORM, Database Migrations, and Business Logic Rules)
+- **Mani** (Role: Frontend Developer - Interactive Dashboards, Charts, Forms & State Management)
+- **Akhila** (Role: Quality Assurance & Testing - Deployment Configurations, Automated Validation & Manual Checks)
+
+---
+
+# Key Features
+
+## Authentication & Security
+
+- **Secure JWT Authentication**: Stateless session management with tokens.
+- **Password Encryption**: Password hashing using Bcrypt.
+- **Role-Based Access Control (RBAC)**: Strict permission matrix applied at the UI level and enforced via middleware at the API level (Fleet Manager, Driver/Dispatcher, Safety Officer, Financial Analyst).
+- **Account Lockout Policy**: Auto-locks accounts for 15 minutes after 5 consecutive incorrect password entries.
+- **Protected Routes**: Navigation guards restricting unauthorized access.
+
+---
+
+## Fleet Management
+
+- Vehicle Registration
+- Vehicle Status Management (AVAILABLE, ON_TRIP, IN_SHOP, RETIRED)
+- Vehicle Lifecycle Tracking
+- Vehicle Availability
+- Vehicle Capacity Validation
+
+---
+
+## Driver Management
+
+- Driver Profiles
+- License Tracking & Expiry Monitoring
+- Safety Score Management
+- Driver Availability
+
+---
+
+## Trip Management
+
+- Create Trips
+- Vehicle & Driver Assignment
+- Dispatch Trips
+- Complete Trips (auto-restores driver/vehicle availability)
+- Cancel Trips
+- Automatic Status Updates
+
+---
+
+## Maintenance
+
+- Create Maintenance Logs
+- Automatic Vehicle Status Updates (moves to "In Shop")
+- Maintenance History
+- Vehicle Availability Control on completion
+
+---
+
+## Fuel & Expense Management
+
+- **Fuel Logbook**: Track refuel dates, liters, price per liter, and odometer readings.
+- **Trip Expense Integration**: Automatically logs corresponding trip expenses whenever a fuel entry is added with an associated trip.
+- **Operational Cost Monitoring**: Track operational expenses (Toll, Food, Repair, Parking, Miscellaneous) against active trips.
+
+---
+
+## Dashboard
+
+- Live KPIs
+- Fleet Utilization
+- Active & Pending Trips
+- Vehicle Availability
+- Drivers on Duty
+- Operational Statistics
+
+---
+
+## Reports & Analytics
+
+- Fuel Efficiency
+- Fleet Utilization
+- Operational Cost
+- Vehicle ROI
+- Interactive Charts
+- CSV Export
+- AI Fleet Insights
+
+---
+
+# Business Rules Implemented
+
+✔ Vehicle Registration Number must be unique
+
+✔ Retired or In-Shop vehicles cannot be dispatched
+
+✔ Drivers with expired licenses cannot be assigned
+
+✔ Suspended drivers cannot be assigned
+
+✔ Vehicles already on a trip cannot be reassigned
+
+✔ Drivers already on a trip cannot be reassigned
+
+✔ Cargo weight validation against vehicle capacity
+
+✔ Dispatch automatically updates Vehicle and Driver status
+
+✔ Trip completion restores Vehicle and Driver availability
+
+✔ Trip cancellation restores availability
+
+✔ Maintenance automatically moves vehicle to "In Shop"
+
+✔ Closing maintenance restores vehicle availability
+
+---
+
+# User Roles
+
+## Fleet Manager
+- Full management over **Vehicles**, **Drivers**, and **Maintenance**.
+- Access to Operational Dashboard and settings.
+
+## Driver (Dispatcher)
+- Exclusively manages **Trips** operations (Create, Dispatch, Complete, Cancel).
+- Holds read-only API access to vehicles/drivers solely for assignment dropdowns.
+
+## Safety Officer
+- Exclusively manages **Driver Compliance** (License monitoring, Safety Score updates, and Safety Dashboard).
+
+## Financial Analyst
+- Manages **Fuel Logs**, **Expenses**, **Analytics (Profitability)**, and holds read-only API access to **Maintenance** costs.
+- Completely hidden from vehicles, drivers, and trips.
+
+---
+
+# Technology Stack
+
+## Frontend
+
+- React (Vite)
+- React Router
+- TanStack Query
+- React Hook Form
+- Zod
+- Tailwind CSS
+- shadcn/ui
+- Recharts
+- Lucide Icons
+
+---
+
+## Backend
+
+- Node.js
+- Express.js
+- Prisma ORM
+- PostgreSQL (Neon)
+- JWT Authentication
+- Bcrypt
+- Zod Validation
+
+---
+
+# Project Structure
 
 ```
-TransitOps/
-├── backend/
-│   ├── prisma/             # Schema, migrations & database seeds
-│   └── src/
-│       ├── config/         # Database and server configs
-│       ├── controllers/    # Express controllers
-│       ├── middlewares/    # Auth, error, and validation middlewares
-│       ├── repositories/   # Prisma query layers (abstraction)
-│       ├── routes/         # Express endpoint definitions
-│       ├── services/       # Core business logic and rules
-│       ├── utils/          # Standard success/error responses
-│       └── validators/     # Zod input schemas
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # Topbar, Sidebar, Dialog modals, notifications dropdown
-│   │   ├── hooks/          # Auth state and toast utilities
-│   │   ├── pages/          # Dashboard, Vehicles, Drivers, Trips, Maintenance, Fuel, Expenses, Settings, Analytics, AIInsights
-│   │   └── services/       # Axios API client functions
-│   └── index.html
-├── render.yaml             # Blueprint deployment definition
-└── README.md
+TransitOps
+│
+├── backend
+│   ├── prisma
+│   └── src
+│       ├── controllers
+│       ├── repositories
+│       ├── services
+│       ├── routes
+│       ├── middlewares
+│       ├── validators
+│       └── config
+│
+├── frontend
+│   └── src
+│       ├── components
+│       ├── pages
+│       ├── hooks
+│       ├── services
+│       └── layouts
+│
+└── render.yaml
 ```
 
 ---
 
-## Installation & Setup
+# Installation
 
-### Prerequisites
-1. **Node.js** (v18 or higher recommended)
-2. **PostgreSQL** (either a local instance or cloud service like Neon.tech)
+## Clone Repository
 
-### Database Setup
-1. Define the PostgreSQL connection string in the backend environment.
-2. In the `backend` folder, run migrations to sync the schema:
-   ```bash
-   npx prisma migrate dev
-   ```
-3. Seed the initial ERP dataset (users, vehicles, drivers, maintenance, refuels, and notifications):
-   ```bash
-   npx prisma db seed
-   ```
+```bash
+git clone <repository-url>
+cd TransitOps
+```
 
-### Running Locally
+---
 
-#### 1. Backend Server
+## Backend Setup
+
+Create `backend/.env` file with the environment variables listed below, then run:
+
 ```bash
 cd backend
 npm install
+npx prisma migrate dev
+npx prisma db seed
 npm run dev
 ```
-The server will boot and run on `http://localhost:5000` (or the customized port configured in `.env`).
 
-#### 2. Frontend Client
+---
+
+## Frontend Setup
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The application will run locally on `http://localhost:5173/`.
 
 ---
 
-## Environment Variables
+# Environment Variables
 
-### Backend Configuration (`backend/.env`)
-```ini
+Create `backend/.env`:
+
+```env
 PORT=5000
 NODE_ENV=development
 DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require
-JWT_SECRET=transitops-super-secret-jwt-key
+JWT_SECRET=your_jwt_secret_key
 JWT_EXPIRES_IN=7d
 FRONTEND_URL=http://localhost:5173
-GEMINI_API_KEY=AIzaSy... (Optional, for Gemini insights)
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ---
 
-## API Endpoint Overview
+# Main API Modules
 
-### 1. Operations CRUD Modules
-- **Authentication**: `POST /api/auth/login`, `/api/auth/profile`
+- **Authentication**: Login, Register, Profile (`GET /api/auth/me`), Change/Reset password
 - **Vehicles**: `/api/vehicles` (GET, POST, PUT, DELETE)
 - **Drivers**: `/api/drivers` (GET, POST, PUT, DELETE)
-- **Trips**: `/api/trips` (GET, POST, PUT, DELETE)
+- **Trips**: `/api/trips` (GET, POST, PUT, DELETE, plus `/dispatch`, `/complete`, `/cancel` transition endpoints)
 - **Maintenance**: `/api/maintenances` (GET, POST, PUT, DELETE)
 - **Fuel Logs**: `/api/fuel-logs` (GET, POST, PUT, DELETE)
 - **Expenses**: `/api/expenses` (GET, POST, PUT, DELETE)
-
-### 2. Operational Transitions
-- **Dispatch Trip**: `POST /api/trips/:id/dispatch`
-- **Complete Trip**: `POST /api/trips/:id/complete`
-- **Cancel Trip**: `POST /api/trips/:id/cancel`
-- **System Alerts**: `GET /api/notifications`, `POST /api/notifications/mark-all-read`, `PUT /api/notifications/:id/read`
-- **AI Analytics**: `GET /api/ai/insights`
-- **Dashboard Stats**: `GET /api/dashboard/stats`
+- **Dashboard**: `/api/dashboard/stats`
+- **Notifications**: System Alerts & unread counts
+- **AI Insights**: Gemini-powered AI analytics
 
 ---
 
-## Production Deployment
-The project is configured for one-click blueprint deployments on Render via [render.yaml](file:///c:/Users/naras/OneDrive/Desktop/transitops-transport-erp/render.yaml). Simply link the repository, configure variables, and deploy.
+# Deployment
+
+The project is configured for deployment on **Render** using **Blueprint Deployments** (`render.yaml`).
+
+Deployment includes:
+- Frontend (Static site)
+- Backend (Web service)
+- PostgreSQL Database
+- Automatic database migrations execution (`npx prisma migrate deploy`)
+
+---
+
+# Acknowledgement
+
+This project was developed as part of the **Odoo Hackathon 2026**, following the official Smart Transport Operations Platform problem statement. The solution demonstrates transport lifecycle management, business rule enforcement, role-based access control, and operational analytics in a modern full-stack web application.
