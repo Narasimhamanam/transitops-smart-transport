@@ -21,6 +21,39 @@ enum Role {
   FINANCIAL_ANALYST
 }
 
+enum VehicleStatus {
+  AVAILABLE
+  ON_TRIP
+  IN_SHOP
+  RETIRED
+}
+
+enum VehicleType {
+  CAR
+  VAN
+  MINIBUS
+  BUS
+  TRUCK
+  TRAILER
+  MOTORCYCLE
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
+
+enum LicenseCategory {
+  A
+  B
+  C
+  D
+  EB
+  EC
+}
+
 // ==============================
 // Models
 // ==============================
@@ -40,6 +73,46 @@ model User {
   @@index([email])
   @@index([role])
   @@map("users")
+}
+
+model Vehicle {
+  id                 String        @id @default(cuid())
+  registrationNumber String        @unique
+  vehicleName        String
+  vehicleType        VehicleType
+  maxLoadCapacity    Float
+  odometer           Float         @default(0)
+  acquisitionCost    Float
+  status             VehicleStatus @default(AVAILABLE)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  // Future phase relations: Trip, MaintenanceLog, FuelLog will reference this model
+
+  @@index([status])
+  @@index([vehicleType])
+  @@index([registrationNumber])
+  @@map("vehicles")
+}
+
+model Driver {
+  id              String          @id @default(cuid())
+  fullName        String
+  licenseNumber   String          @unique
+  licenseCategory LicenseCategory
+  licenseExpiry   DateTime
+  contactNumber   String
+  safetyScore     Int             @default(100)
+  status          DriverStatus    @default(AVAILABLE)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Future phase relations: Trip, Incident will reference this model
+
+  @@index([status])
+  @@index([licenseCategory])
+  @@index([licenseNumber])
+  @@map("drivers")
 }
 
 model AuditLog {
