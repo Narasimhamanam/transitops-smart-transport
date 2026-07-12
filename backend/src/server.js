@@ -12,6 +12,11 @@ const routes = require('./routes');
 const app = express();
 
 // ==============================
+// Trust Proxy (Required for Render, Railway, Heroku, etc.)
+// ==============================
+app.set('trust proxy', 1);
+
+// ==============================
 // Security Middlewares
 // ==============================
 app.use(helmet());

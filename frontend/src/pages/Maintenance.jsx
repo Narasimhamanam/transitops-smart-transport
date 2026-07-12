@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, Eye, Wrench, Check, Ban, AlertTriangle } from 'lucide-react';
+import { usePermission } from '../hooks/usePermission';
 
 import PageHeader     from '../components/ui/PageHeader';
 import SearchBar      from '../components/ui/SearchBar';
@@ -193,6 +194,8 @@ function ActionConfirmModal({ isOpen, onClose, onConfirm, title, desc, pending, 
 export default function Maintenance() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { canWriteModule } = usePermission();
+  const canWrite = canWriteModule('maintenance');
   const { toast, showToast, clearToast } = useToast();
 
   const [search, setSearch]             = useState('');
@@ -215,14 +218,16 @@ export default function Maintenance() {
   const logs = mntResponse?.data ?? [];
   const vehicles = vehiclesResponse?.data ?? [];
 
+
+
   const filteredLogs = useMemo(() => {
     return logs.filter((item) => {
       const q = search.toLowerCase();
       const matchSearch = !search ||
-        item.maintenanceNumber.toLowerCase().includes(q) ||
-        item.maintenanceType.toLowerCase().includes(q) ||
-        item.serviceCenter.toLowerCase().includes(q) ||
-        item.vehicle.registrationNumber.toLowerCase().includes(q);
+        (item.maintenanceNumber && item.maintenanceNumber.toLowerCase().includes(q)) ||
+        (item.maintenanceType && item.maintenanceType.toLowerCase().includes(q)) ||
+        (item.serviceCenter && item.serviceCenter.toLowerCase().includes(q)) ||
+        (item.vehicle?.registrationNumber && item.vehicle.registrationNumber.toLowerCase().includes(q));
 
       const matchStatus  = !statusFilter  || item.status === statusFilter;
       const matchVehicle = !vehicleFilter || item.vehicleId === vehicleFilter;
@@ -230,11 +235,11 @@ export default function Maintenance() {
       return matchSearch && matchStatus && matchVehicle;
     });
   }, [logs, search, statusFilter, vehicleFilter]);
-
   const paginatedLogs = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return filteredLogs.slice(start, start + PAGE_SIZE);
   }, [filteredLogs, page]);
+
 
   const totalPages = Math.ceil(filteredLogs.length / PAGE_SIZE);
 
@@ -296,25 +301,25 @@ export default function Maintenance() {
         <div className="flex items-center justify-end gap-1">
           <button onClick={() => navigate(`/maintenance/${m.id}`)} className="btn-ghost p-2" title="View Details"><Eye className="w-4 h-4" /></button>
 
-          {m.status === 'SCHEDULED' && (
+          {canWrite && m.status === 'SCHEDULED' && (
             <>
               <button onClick={() => { setEditRecord(m); setShowForm(true); }} className="btn-ghost p-2" title="Edit Scheduled Log"><Pencil className="w-4 h-4" /></button>
               <button onClick={() => setStartTarget(m)} className="btn-ghost p-2 text-warning-400 hover:text-warning-300 hover:bg-warning-500/10" title="Start Service"><Wrench className="w-4 h-4" /></button>
             </>
           )}
 
-          {m.status === 'IN_PROGRESS' && (
+          {canWrite && m.status === 'IN_PROGRESS' && (
             <>
               <button onClick={() => { setEditRecord(m); setShowForm(true); }} className="btn-ghost p-2" title="Edit Cost & Details"><Pencil className="w-4 h-4" /></button>
               <button onClick={() => setCompleteTarget(m)} className="btn-ghost p-2 text-success-400 hover:text-success-300 hover:bg-success-500/10" title="Complete Service"><Check className="w-4 h-4" /></button>
             </>
           )}
 
-          {(m.status === 'SCHEDULED' || m.status === 'IN_PROGRESS') && (
+          {canWrite && (m.status === 'SCHEDULED' || m.status === 'IN_PROGRESS') && (
             <button onClick={() => setCancelTarget(m)} className="btn-ghost p-2 text-danger-400 hover:text-danger-300 hover:bg-danger-500/10" title="Cancel Service"><Ban className="w-4 h-4" /></button>
           )}
 
-          {(m.status === 'SCHEDULED' || m.status === 'CANCELLED') && (
+          {canWrite && (m.status === 'SCHEDULED' || m.status === 'CANCELLED') && (
             <button onClick={() => setDeleteTarget(m)} className="btn-ghost p-2 text-slate-500 hover:text-danger-400 hover:bg-danger-500/10" title="Delete Log"><Trash2 className="w-4 h-4" /></button>
           )}
         </div>
@@ -327,12 +332,12 @@ export default function Maintenance() {
       <PageHeader
         title="Fleet Maintenance Logs"
         subtitle={`${filteredLogs.length} maintenance file${filteredLogs.length !== 1 ? 's' : ''} tracked`}
-        action={
+        action={canWrite ? (
           <button id="schedule-service-btn" onClick={() => { setEditRecord(null); setShowForm(true); }} className="btn-primary flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Schedule Service
           </button>
-        }
+        ) : null}
       />
 
       <div className="card p-5">

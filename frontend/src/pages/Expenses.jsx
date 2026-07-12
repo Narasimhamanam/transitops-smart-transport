@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Pencil, Trash2, Landmark, AlertTriangle } from 'lucide-react';
+import { usePermission } from '../hooks/usePermission';
 
 import PageHeader   from '../components/ui/PageHeader';
 import SearchBar    from '../components/ui/SearchBar';
@@ -113,6 +114,8 @@ function ExpenseFormModal({ isOpen, onClose, editRecord, trips, onSuccess }) {
 export default function Expenses() {
   const queryClient = useQueryClient();
   const { toast, showToast, clearToast } = useToast();
+  const { canWriteModule } = usePermission();
+  const canWrite = canWriteModule('expenses');
 
   const [search, setSearch]         = useState('');
   const [tripFilter, setTripFilter]   = useState('');
@@ -127,20 +130,20 @@ export default function Expenses() {
 
   const list = expResponse?.data ?? [];
   const trips = tripsResponse?.data ?? [];
-
   const filteredExpenses = useMemo(() => {
     return list.filter((item) => {
       const q = search.toLowerCase();
       const matchSearch = !search ||
-        item.description.toLowerCase().includes(q) ||
-        item.expenseType.toLowerCase().includes(q) ||
-        item.trip.tripNumber.toLowerCase().includes(q);
+        (item.description && item.description.toLowerCase().includes(q)) ||
+        (item.expenseType && item.expenseType.toLowerCase().includes(q)) ||
+        (item.trip?.tripNumber && item.trip.tripNumber.toLowerCase().includes(q));
 
       const matchTrip = !tripFilter || item.tripId === tripFilter;
 
       return matchSearch && matchTrip;
     });
   }, [list, search, tripFilter]);
+
 
   const paginatedExpenses = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
@@ -177,8 +180,8 @@ export default function Expenses() {
       key: 'actions', label: 'Actions', className: 'text-right',
       render: (ex) => (
         <div className="flex items-center justify-end gap-1">
-          <button onClick={() => { setEditRecord(ex); setShowForm(true); }} className="btn-ghost p-2" title="Edit Record"><Pencil className="w-4 h-4" /></button>
-          <button onClick={() => setDeleteTarget(ex)} className="btn-ghost p-2 text-slate-500 hover:text-danger-400 hover:bg-danger-500/10" title="Delete Record"><Trash2 className="w-4 h-4" /></button>
+          {canWrite && <button onClick={() => { setEditRecord(ex); setShowForm(true); }} className="btn-ghost p-2" title="Edit Record"><Pencil className="w-4 h-4" /></button>}
+          {canWrite && <button onClick={() => setDeleteTarget(ex)} className="btn-ghost p-2 text-slate-500 hover:text-danger-400 hover:bg-danger-500/10" title="Delete Record"><Trash2 className="w-4 h-4" /></button>}
         </div>
       ),
     },
@@ -189,12 +192,12 @@ export default function Expenses() {
       <PageHeader
         title="Active Operations Expenses"
         subtitle={`${filteredExpenses.length} expense transactions filed`}
-        action={
+        action={canWrite ? (
           <button id="add-expense-btn" onClick={() => { setEditRecord(null); setShowForm(true); }} className="btn-primary flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Track Expense
           </button>
-        }
+        ) : null}
       />
 
       <div className="card p-5">

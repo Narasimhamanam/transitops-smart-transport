@@ -25,40 +25,60 @@ export default function App() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login"           element={<Login />} />
+      <Route path="/register"        element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reset-password"  element={<ResetPassword />} />
 
-      {/* Protected */}
+      {/* Protected – requires authentication */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/"               element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard"      element={<Dashboard />} />
-          <Route path="/settings"       element={<Settings />} />
+          <Route path="/"          element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* Operations Restricted Routes */}
+          {/* Fleet Manager: Vehicles */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
+            <Route path="/vehicles"         element={<Vehicles />} />
+            <Route path="/vehicles/:id"     element={<VehicleDetail />} />
+          </Route>
+
+          {/* Fleet Manager + Driver (DISPATCHER): Trips */}
           <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'DISPATCHER']} />}>
-            <Route path="/vehicles"       element={<Vehicles />} />
-            <Route path="/vehicles/:id"   element={<VehicleDetail />} />
-            <Route path="/drivers"        element={<Drivers />} />
-            <Route path="/drivers/:id"    element={<DriverDetail />} />
-            <Route path="/trips"          element={<Trips />} />
-            <Route path="/trips/:id"      element={<TripDetail />} />
-            <Route path="/maintenance"    element={<Maintenance />} />
-            <Route path="/maintenance/:id" element={<MaintenanceDetail />} />
+            <Route path="/trips"            element={<Trips />} />
+            <Route path="/trips/:id"        element={<TripDetail />} />
           </Route>
 
-          {/* Compliance Restricted Routes */}
-          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST']} />}>
-            <Route path="/analytics"      element={<Analytics />} />
-            <Route path="/ai-insights"    element={<AIInsights />} />
+          {/* Safety Officer: Drivers (read + safety update only) */}
+          <Route element={<RoleGuard allowedRoles={['SAFETY_OFFICER']} />}>
+            <Route path="/drivers"          element={<Drivers />} />
+            <Route path="/drivers/:id"      element={<DriverDetail />} />
           </Route>
 
-          {/* Finance Restricted Routes */}
+          {/* Fleet Manager: Maintenance */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
+            <Route path="/maintenance"      element={<Maintenance />} />
+            <Route path="/maintenance/:id"  element={<MaintenanceDetail />} />
+          </Route>
+
+          {/* Financial Analyst + Fleet Manager: Fuel & Expenses */}
           <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']} />}>
-            <Route path="/fuel-logs"      element={<FuelLogs />} />
-            <Route path="/expenses"       element={<Expenses />} />
+            <Route path="/fuel-logs"        element={<FuelLogs />} />
+            <Route path="/expenses"         element={<Expenses />} />
+          </Route>
+
+          {/* Analytics: Fleet Manager, Safety Officer, Financial Analyst */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST']} />}>
+            <Route path="/analytics"        element={<Analytics />} />
+          </Route>
+
+          {/* AI Insights: Fleet Manager only */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
+            <Route path="/ai-insights"      element={<AIInsights />} />
+          </Route>
+
+          {/* Settings: Fleet Manager only */}
+          <Route element={<RoleGuard allowedRoles={['FLEET_MANAGER']} />}>
+            <Route path="/settings"         element={<Settings />} />
           </Route>
         </Route>
       </Route>

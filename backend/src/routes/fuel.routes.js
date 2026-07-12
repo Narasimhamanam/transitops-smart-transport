@@ -6,12 +6,15 @@ const { createFuelLogSchema, updateFuelLogSchema } = require('../validators/fuel
 
 const router = Router();
 
+// Fleet Manager + Financial Analyst manage fuel logs
+const FUEL_ROLES = ['FLEET_MANAGER', 'FINANCIAL_ANALYST'];
+
 router.use(authenticate);
 
-router.post(  '/',    authorize('FLEET_MANAGER', 'DISPATCHER'), validate(createFuelLogSchema), fuelController.create);
-router.get(   '/',                                   fuelController.findAll);
-router.get(   '/:id',                                fuelController.findById);
-router.put(   '/:id', authorize('FLEET_MANAGER', 'DISPATCHER'), validate(updateFuelLogSchema), fuelController.update);
-router.delete('/:id', authorize('FLEET_MANAGER', 'DISPATCHER'),                                fuelController.remove);
+router.post(  '/',    authorize(...FUEL_ROLES), validate(createFuelLogSchema), fuelController.create);
+router.get(   '/',    authorize(...FUEL_ROLES), fuelController.findAll);
+router.get(   '/:id', authorize(...FUEL_ROLES), fuelController.findById);
+router.put(   '/:id', authorize(...FUEL_ROLES), validate(updateFuelLogSchema), fuelController.update);
+router.delete('/:id', authorize(...FUEL_ROLES), fuelController.remove);
 
 module.exports = router;

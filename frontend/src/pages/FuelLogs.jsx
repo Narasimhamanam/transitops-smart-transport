@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Pencil, Trash2, Fuel, AlertTriangle } from 'lucide-react';
+import { usePermission } from '../hooks/usePermission';
 
 import PageHeader   from '../components/ui/PageHeader';
 import SearchBar    from '../components/ui/SearchBar';
@@ -147,6 +148,8 @@ function FuelFormModal({ isOpen, onClose, editRecord, vehicles, trips, onSuccess
 export default function FuelLogs() {
   const queryClient = useQueryClient();
   const { toast, showToast, clearToast } = useToast();
+  const { canWriteModule } = usePermission();
+  const canWrite = canWriteModule('fuel-logs');
 
   const [search, setSearch]             = useState('');
   const [vehicleFilter, setVehicleFilter] = useState('');
@@ -163,20 +166,20 @@ export default function FuelLogs() {
   const logs = logsResponse?.data ?? [];
   const vehicles = vehiclesResponse?.data ?? [];
   const trips = tripsResponse?.data ?? [];
-
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       const q = search.toLowerCase();
       const matchSearch = !search ||
-        log.fuelStation.toLowerCase().includes(q) ||
-        log.vehicle.registrationNumber.toLowerCase().includes(q) ||
-        (log.trip && log.trip.tripNumber.toLowerCase().includes(q));
+        (log.fuelStation && log.fuelStation.toLowerCase().includes(q)) ||
+        (log.vehicle?.registrationNumber && log.vehicle.registrationNumber.toLowerCase().includes(q)) ||
+        (log.trip?.tripNumber && log.trip.tripNumber.toLowerCase().includes(q));
 
       const matchVehicle = !vehicleFilter || log.vehicleId === vehicleFilter;
 
       return matchSearch && matchVehicle;
     });
   }, [logs, search, vehicleFilter]);
+
 
   const paginatedLogs = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
@@ -217,8 +220,8 @@ export default function FuelLogs() {
       key: 'actions', label: 'Actions', className: 'text-right',
       render: (fl) => (
         <div className="flex items-center justify-end gap-1">
-          <button onClick={() => { setEditRecord(fl); setShowForm(true); }} className="btn-ghost p-2" title="Edit Entry"><Pencil className="w-4 h-4" /></button>
-          <button onClick={() => setDeleteTarget(fl)} className="btn-ghost p-2 text-slate-500 hover:text-danger-400 hover:bg-danger-500/10" title="Delete Entry"><Trash2 className="w-4 h-4" /></button>
+          {canWrite && <button onClick={() => { setEditRecord(fl); setShowForm(true); }} className="btn-ghost p-2" title="Edit Entry"><Pencil className="w-4 h-4" /></button>}
+          {canWrite && <button onClick={() => setDeleteTarget(fl)} className="btn-ghost p-2 text-slate-500 hover:text-danger-400 hover:bg-danger-500/10" title="Delete Entry"><Trash2 className="w-4 h-4" /></button>}
         </div>
       ),
     },
@@ -229,12 +232,12 @@ export default function FuelLogs() {
       <PageHeader
         title="Fuel Logbook"
         subtitle={`${filteredLogs.length} refuel entries logged`}
-        action={
+        action={canWrite ? (
           <button id="add-fuel-btn" onClick={() => { setEditRecord(null); setShowForm(true); }} className="btn-primary flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Add Fuel Entry
           </button>
-        }
+        ) : null}
       />
 
       <div className="card p-5">
