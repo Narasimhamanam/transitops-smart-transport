@@ -1,307 +1,173 @@
-# 🚛 TransitOps – Smart Transport Operations Platform
+# 🚛 TransitOps – Smart Transport Operations & Fleet Management Platform
 
-## Odoo Hackathon 2026 Submission
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.19-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.14-2D3748?style=flat&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon_Serverless-4169E1?style=flat&logo=postgresql&logoColor=white)](https://neon.tech/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Hackathon](https://img.shields.io/badge/Hackathon-Odoo_2026_Submission-714B67?style=flat)](https://odoo.com)
 
-TransitOps is a full-stack Transport Operations Platform developed for the **Odoo Hackathon 2026**.
-
-The application digitizes transport operations by providing a centralized platform to manage vehicles, drivers, trip dispatches, maintenance logging, fuel tracking, operational expenses, authentication with role-based access control, and live operational analytics.
-
-The system follows the official hackathon problem statement and enforces real-world business rules to improve fleet efficiency, operational visibility, and compliance.
-
----
-
-# Problem Statement
-
-Many logistics companies still rely on spreadsheets and manual records to manage transport operations, leading to:
-
-- Scheduling conflicts
-- Vehicle underutilization
-- Missed maintenance
-- Expired driver licenses
-- Inaccurate fuel and expense tracking
-- Limited operational visibility
-
-TransitOps addresses these challenges by providing a centralized web application that manages the complete transport lifecycle.
+A full-stack, enterprise-grade Transport Operations and Fleet Management web platform developed for the **Odoo Hackathon 2026**. TransitOps digitizes the entire commercial transport lifecycle—replacing error-prone logistics spreadsheets with automated vehicle lifecycle tracking, driver safety scorecards, dispatch validation state machines, maintenance logging, fuel consumption monitoring, and role-based operational analytics.
 
 ---
 
-# Team
+## 👥 Hackathon Team & Contributor Attribution
 
-**Odoo Hackathon 2026**
+Built during the **Odoo Hackathon 2026** by a four-member engineering team. Contributions are accurately reflected in the git commit history:
 
-Team Members & Core Contributions:
-
-- **Narasimha** (Role: Full-Stack Developer - Frontend Integration & Backend Security Architecture)
-- **Pravallika** (Role: Backend & DB Developer - Prisma ORM, Database Migrations, and Business Logic Rules)
-- **Mani** (Role: Frontend Developer - Interactive Dashboards, Charts, Forms & State Management)
-- **Akhila** (Role: Quality Assurance & Testing - Deployment Configurations, Automated Validation & Manual Checks)
-
----
-
-# Key Features
-
-## Authentication & Security
-
-- **Secure JWT Authentication**: Stateless session management with tokens.
-- **Password Encryption**: Password hashing using Bcrypt.
-- **Role-Based Access Control (RBAC)**: Strict permission matrix applied at the UI level and enforced via middleware at the API level (Fleet Manager, Driver/Dispatcher, Safety Officer, Financial Analyst).
-- **Account Lockout Policy**: Auto-locks accounts for 15 minutes after 5 consecutive incorrect password entries.
-- **Protected Routes**: Navigation guards restricting unauthorized access.
+- **Narasimha Manam** ([@Narasimhamanam](https://github.com/Narasimhamanam)) — **Lead Architect & Full-Stack Engineer (35 commits)**  
+  Architected the end-to-end full-stack application; engineered the backend security model, JWT authentication, and RBAC middleware; designed the Prisma schema and relational constraints; integrated the complete REST API suite with frontend React services; built the business-rule dispatch state machine.
+- **Akhila Bevara** ([@AkhilaBevara](https://github.com/AkhilaBevara)) — **Quality Assurance & Testing (2 commits)**  
+  Configured deployment scripts, verified environment settings, ran system sanity tests, and performed end-to-end validation.
+- **Gorju Manikanta Srinivas** ([@gorjumanikantasrinivas](https://github.com/gorjumanikantasrinivas)) — **Frontend Developer (2 commits)**  
+  Built interactive analytics dashboards, charts with Recharts, and UI presentation components.
+- **Maturi Venkata Sai Pravallika** ([@Pravallika](https://github.com/Narasimhamanam)) — **Backend Contributor (1 commit)**  
+  Contributed to initial database seed scripts and entity definitions.
 
 ---
 
-## Fleet Management
+## 📐 System Architecture
 
-- Vehicle Registration
-- Vehicle Status Management (AVAILABLE, ON_TRIP, IN_SHOP, RETIRED)
-- Vehicle Lifecycle Tracking
-- Vehicle Availability
-- Vehicle Capacity Validation
+```mermaid
+graph TD
+    Client["React 18 Frontend<br/>(Vite + Tailwind CSS + TanStack Query)"]
+    API["Express.js REST API<br/>(Node.js + Zod Validation)"]
+    Auth["JWT Auth & Security<br/>(Bcrypt + RBAC Middleware)"]
+    ORM["Prisma ORM<br/>(Connection Pooling & Migrations)"]
+    DB[("PostgreSQL Database<br/>(Neon Serverless)")]
+    AI["Gemini AI Service<br/>(Fleet Anomaly Insights)"]
 
----
-
-## Driver Management
-
-- Driver Profiles
-- License Tracking & Expiry Monitoring
-- Safety Score Management
-- Driver Availability
-
----
-
-## Trip Management
-
-- Create Trips
-- Vehicle & Driver Assignment
-- Dispatch Trips
-- Complete Trips (auto-restores driver/vehicle availability)
-- Cancel Trips
-- Automatic Status Updates
-
----
-
-## Maintenance
-
-- Create Maintenance Logs
-- Automatic Vehicle Status Updates (moves to "In Shop")
-- Maintenance History
-- Vehicle Availability Control on completion
-
----
-
-## Fuel & Expense Management
-
-- **Fuel Logbook**: Track refuel dates, liters, price per liter, and odometer readings.
-- **Trip Expense Integration**: Automatically logs corresponding trip expenses whenever a fuel entry is added with an associated trip.
-- **Operational Cost Monitoring**: Track operational expenses (Toll, Food, Repair, Parking, Miscellaneous) against active trips.
-
----
-
-## Dashboard
-
-- Live KPIs
-- Fleet Utilization
-- Active & Pending Trips
-- Vehicle Availability
-- Drivers on Duty
-- Operational Statistics
-
----
-
-## Reports & Analytics
-
-- Fuel Efficiency
-- Fleet Utilization
-- Operational Cost
-- Vehicle ROI
-- Interactive Charts
-- CSV Export
-- AI Fleet Insights
-
----
-
-# Business Rules Implemented
-
-✔ Vehicle Registration Number must be unique
-
-✔ Retired or In-Shop vehicles cannot be dispatched
-
-✔ Drivers with expired licenses cannot be assigned
-
-✔ Suspended drivers cannot be assigned
-
-✔ Vehicles already on a trip cannot be reassigned
-
-✔ Drivers already on a trip cannot be reassigned
-
-✔ Cargo weight validation against vehicle capacity
-
-✔ Dispatch automatically updates Vehicle and Driver status
-
-✔ Trip completion restores Vehicle and Driver availability
-
-✔ Trip cancellation restores availability
-
-✔ Maintenance automatically moves vehicle to "In Shop"
-
-✔ Closing maintenance restores vehicle availability
-
----
-
-# User Roles
-
-## Fleet Manager
-- Full management over **Vehicles**, **Drivers**, and **Maintenance**.
-- Access to Operational Dashboard and settings.
-
-## Driver (Dispatcher)
-- Exclusively manages **Trips** operations (Create, Dispatch, Complete, Cancel).
-- Holds read-only API access to vehicles/drivers solely for assignment dropdowns.
-
-## Safety Officer
-- Exclusively manages **Driver Compliance** (License monitoring, Safety Score updates, and Safety Dashboard).
-
-## Financial Analyst
-- Manages **Fuel Logs**, **Expenses**, **Analytics (Profitability)**, and holds read-only API access to **Maintenance** costs.
-- Completely hidden from vehicles, drivers, and trips.
-
----
-
-# Technology Stack
-
-## Frontend
-
-- React (Vite)
-- React Router
-- TanStack Query
-- React Hook Form
-- Zod
-- Tailwind CSS
-- shadcn/ui
-- Recharts
-- Lucide Icons
-
----
-
-## Backend
-
-- Node.js
-- Express.js
-- Prisma ORM
-- PostgreSQL (Neon)
-- JWT Authentication
-- Bcrypt
-- Zod Validation
-
----
-
-# Project Structure
-
-```
-TransitOps
-│
-├── backend
-│   ├── prisma
-│   └── src
-│       ├── controllers
-│       ├── repositories
-│       ├── services
-│       ├── routes
-│       ├── middlewares
-│       ├── validators
-│       └── config
-│
-├── frontend
-│   └── src
-│       ├── components
-│       ├── pages
-│       ├── hooks
-│       ├── services
-│       └── layouts
-│
-└── render.yaml
+    Client -->|HTTP / JSON + Bearer JWT| API
+    API --> Auth
+    Auth --> API
+    API -->|Schema-Enforced Queries| ORM
+    ORM --> DB
+    API -.->|Async Prompt Analytics| AI
 ```
 
 ---
 
-# Installation
+## ⚡ Enforced Business Rules & State Machines
 
-## Clone Repository
+Unlike basic CRUD dashboards, TransitOps enforces real-world operational safety and regulatory constraints at both the database and API middleware layers:
 
+1. **Unique Fleet Registrations:** License plate numbers and vehicle registration IDs must be globally unique.
+2. **Vehicle Lifecycle Enforcement:** Vehicles have strict lifecycle states (`AVAILABLE`, `ON_TRIP`, `IN_SHOP`, `RETIRED`). Vehicles in `RETIRED` or `IN_SHOP` cannot be scheduled or dispatched.
+3. **Driver Safety & License Guard:** Dispatch automatically blocks drivers with expired driver's licenses or active safety suspensions.
+4. **Collision Prevention:** Vehicles or drivers currently marked `ON_TRIP` cannot be assigned to overlapping dispatches.
+5. **Payload Capacity Validation:** Cargo weight is validated against the selected vehicle's rated gross capacity; overcapacity dispatches are rejected.
+6. **Atomic State Transitions:**
+   - **Dispatch:** Atomically transitions vehicle and driver to `ON_TRIP`.
+   - **Trip Completion:** Restores vehicle and driver status back to `AVAILABLE`.
+   - **Trip Cancellation:** Safely rolls back vehicle and driver allocation.
+7. **Maintenance Isolation:** Logging a maintenance order automatically moves the vehicle to `IN_SHOP`. Closing the maintenance log restores vehicle status to `AVAILABLE`.
+8. **Automated Expense Pairing:** Fuel entries with an associated trip ID automatically generate synchronized financial expense logs.
+
+---
+
+## 🔐 Role-Based Access Control (RBAC)
+
+The system enforces strict permission boundaries across 4 operational personas:
+
+| Role | Vehicle & Driver Admin | Trip Dispatch & Execution | Maintenance Orders | Fuel & Expense Logs | Operational Analytics |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Fleet Manager** | Full Access | View Only | Full Access | View Only | Full Dashboard |
+| **Dispatcher / Driver** | Read Only (Dropdowns) | Full Access | No Access | No Access | Active Trips Only |
+| **Safety Officer** | Safety / Scores Only | Read Only | Audit Logs | No Access | Safety Dashboard |
+| **Financial Analyst** | Hidden | No Access | Read Costs | Full Access | Financial ROI & Cost/KM |
+
+---
+
+## 🗂️ Project Structure
+
+```
+transitops-smart-transport/
+├── backend/
+│   ├── prisma/
+│   │   ├── migrations/       # Version-controlled DB migrations
+│   │   ├── schema.prisma     # Relational schema definition
+│   │   └── seed.js           # Demo seed dataset
+│   ├── src/
+│   │   ├── config/           # Database & JWT configurations
+│   │   ├── controllers/      # Route handler logic
+│   │   ├── middlewares/      # JWT authentication & RBAC guards
+│   │   ├── repositories/     # Data access layer (Prisma queries)
+│   │   ├── routes/           # Express router endpoints
+│   │   ├── services/         # Business logic & state machine rules
+│   │   └── validators/       # Zod schema request validation
+│   ├── .env.example          # Backend environment template
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/       # UI building blocks (shadcn-inspired)
+│   │   ├── context/          # Global Auth & State context
+│   │   ├── hooks/            # Custom hooks
+│   │   ├── pages/            # View pages (Fleet, Trips, Drivers, Expenses)
+│   │   └── services/         # Axios API clients
+│   ├── .env.example          # Frontend environment template
+│   └── package.json
+│
+├── docker-compose.yml        # Multi-container local orchestration
+└── render.yaml               # Infrastructure-as-code Blueprint
+```
+
+---
+
+## 🚀 Quickstart & Local Setup
+
+### Prerequisites
+- **Node.js**: `v18.x` or `v20.x`
+- **PostgreSQL**: Local instance or free [Neon](https://neon.tech/) connection string
+
+### 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd TransitOps
+git clone https://github.com/Narasimhamanam/transitops-smart-transport.git
+cd transitops-smart-transport
 ```
 
----
-
-## Backend Setup
-
-Create `backend/.env` file with the environment variables listed below, then run:
-
+### 2. Backend Setup
 ```bash
 cd backend
+cp .env.example .env
+# Edit .env with your DATABASE_URL and JWT_SECRET
+
 npm install
 npx prisma migrate dev
 npx prisma db seed
 npm run dev
+# Backend runs at http://localhost:5000
 ```
 
----
-
-## Frontend Setup
-
+### 3. Frontend Setup
 ```bash
+# In a new terminal window
 cd frontend
+cp .env.example .env
+# VITE_API_URL defaults to http://localhost:5000/api
+
 npm install
 npm run dev
+# Frontend runs at http://localhost:5173
+```
+
+### 4. Running with Docker Compose
+```bash
+docker compose up -d
 ```
 
 ---
 
-# Environment Variables
+## 🧪 Verification & Tested Workflows
 
-Create `backend/.env`:
-
-```env
-PORT=5000
-NODE_ENV=development
-DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRES_IN=7d
-FRONTEND_URL=http://localhost:5173
-GEMINI_API_KEY=your_gemini_api_key
-```
+- **Prisma Schema Verification:** Verified against PostgreSQL relational constraints with cascade protections.
+- **Authentication Handshake:** Tested JWT token issue, payload verification, and 15-minute lockout security after 5 failed login attempts.
+- **Dispatch Validation Test:** Verified that dispatching a vehicle with payload > capacity returns HTTP 400 with descriptive validation error.
 
 ---
 
-# Main API Modules
+## ⚠️ Limitations & Honest Status
 
-- **Authentication**: Login, Register, Profile (`GET /api/auth/me`), Change/Reset password
-- **Vehicles**: `/api/vehicles` (GET, POST, PUT, DELETE)
-- **Drivers**: `/api/drivers` (GET, POST, PUT, DELETE)
-- **Trips**: `/api/trips` (GET, POST, PUT, DELETE, plus `/dispatch`, `/complete`, `/cancel` transition endpoints)
-- **Maintenance**: `/api/maintenances` (GET, POST, PUT, DELETE)
-- **Fuel Logs**: `/api/fuel-logs` (GET, POST, PUT, DELETE)
-- **Expenses**: `/api/expenses` (GET, POST, PUT, DELETE)
-- **Dashboard**: `/api/dashboard/stats`
-- **Notifications**: System Alerts & unread counts
-- **AI Insights**: Gemini-powered AI analytics
-
----
-
-# Deployment
-
-The project is configured for deployment on **Render** using **Blueprint Deployments** (`render.yaml`).
-
-Deployment includes:
-- Frontend (Static site)
-- Backend (Web service)
-- PostgreSQL Database
-- Automatic database migrations execution (`npx prisma migrate deploy`)
-
----
-
-# Acknowledgement
-
-This project was developed as part of the **Odoo Hackathon 2026**, following the official Smart Transport Operations Platform problem statement. The solution demonstrates transport lifecycle management, business rule enforcement, role-based access control, and operational analytics in a modern full-stack web application.
+- **Hackathon Scope:** Developed during a 48-hour hackathon sprint. Built as a functional proof-of-concept; live GPS telemetry feeds and IoT OBD-II hardware integrations are mocked via simulated trip data.
+- **Test Coverage:** Automated unit test coverage is planned; currently validated via API integration and manual regression testing.
